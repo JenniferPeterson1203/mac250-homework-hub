@@ -1,0 +1,63 @@
+// Homework Hub - Conceptual ERD (3NF)
+// Author: Jennifer Peterson | Course: MAC 250
+
+Table Students {
+  student_id integer [pk, increment]
+  first_name varchar(50) [not null]
+  last_name varchar(50) [not null]
+  email varchar(150) [unique, not null]
+  academic_level varchar(30) [not null, note: 'High School, College, Bootcamp']
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table Platforms {
+  platform_id integer [pk, increment]
+  platform_name varchar(50) [unique, not null, note: 'Brightspace, MyOpenMath, CodePath, Paper']
+  platform_url varchar(255)
+  is_digital boolean [not null, default: true]
+}
+
+Table Courses {
+  course_id integer [pk, increment]
+  student_id integer [not null]
+  default_platform_id integer [not null]
+  course_code varchar(20) [not null]
+  course_name varchar(100) [not null]
+  institution varchar(100) [not null, note: 'LaGuardia CC, CodePath, George School']
+  term varchar(30) [not null]
+}
+
+Table Assignments {
+  assignment_id integer [pk, increment]
+  course_id integer [not null]
+  platform_id integer [not null]
+  title varchar(150) [not null]
+  description text
+  due_date datetime [not null]
+  submission_format varchar(20) [not null, note: 'Digital or Paper']
+  status varchar(20) [not null, default: 'Pending', note: 'Pending, In Progress, Submitted']
+  priority varchar(15) [not null, default: 'Medium', note: 'Low, Medium, High']
+}
+
+Table Tags {
+  tag_id integer [pk, increment]
+  tag_name varchar(40) [unique, not null]
+}
+
+// Junction Table resolving M:N between Assignments and Tags
+Table Assignment_Tags {
+  assignment_id integer [not null]
+  tag_id integer [not null]
+
+  indexes {
+    (assignment_id, tag_id) [pk]
+  }
+}
+
+// Relationships
+Ref: Courses.student_id > Students.student_id
+Ref: Courses.default_platform_id > Platforms.platform_id
+Ref: Assignments.course_id > Courses.course_id
+Ref: Assignments.platform_id > Platforms.platform_id
+Ref: Assignment_Tags.assignment_id > Assignments.assignment_id
+Ref: Assignment_Tags.tag_id > Tags.tag_id
